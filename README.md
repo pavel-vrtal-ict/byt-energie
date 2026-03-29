@@ -18,9 +18,9 @@ Aplikace se po nasazení otevírá v prohlížeči na stabilní adrese — **nem
    ```
    Nahraďte `VAS_UZIVATEL` svým uživatelským jménem na GitHubu.
 
-3. V repozitáři na GitHubu: **Settings → Pages**. U **Build and deployment** zvolte zdroj **GitHub Actions** (ne „Deploy from a branch“).
+3. V repozitáři na GitHubu: **Settings → Pages**. U **Build and deployment** zvolte **Deploy from a branch**, větev **`gh-pages`**, složka **`/ (root)`**. (Workflow po každém pushi na `main` nasadí obsah složky `dist` do větve `gh-pages`.)
 
-4. Po dokončení workflow (záložka **Actions**) bude aplikace dostupná na adrese:
+4. Po doběhnutí workflow (**Actions**) počkejte 1–2 minuty a otevřete:
    ```text
    https://VAS_UZIVATEL.github.io/byt-energie/
    ```
