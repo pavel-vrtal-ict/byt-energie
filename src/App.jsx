@@ -16,6 +16,7 @@ import { AddEntryForm } from './components/AddEntryForm'
 import { SummaryCards } from './components/SummaryCards'
 import { ConsumptionCharts } from './components/ConsumptionCharts'
 import { EntryList } from './components/EntryList'
+import { BackupRestore } from './components/BackupRestore'
 import './App.css'
 
 function App() {
@@ -47,6 +48,10 @@ function App() {
 
   const handleUpdateInitialState = useCallback((state) => {
     setData((d) => updateInitialState(d, state))
+  }, [])
+
+  const handleRestoreBackup = useCallback((restored) => {
+    setData(restored)
   }, [])
 
   return (
@@ -96,6 +101,10 @@ function App() {
             onDeleteElectricity={handleDeleteElectricity}
             onDeleteWater={handleDeleteWater}
           />
+        </section>
+
+        <section className="section backup-section">
+          <BackupRestore data={data} onRestore={handleRestoreBackup} />
         </section>
       </main>
     </div>

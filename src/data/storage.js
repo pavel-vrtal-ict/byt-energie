@@ -77,3 +77,35 @@ export function updateInitialState(data, { initialElectricity, initialWater, ini
     }),
   }
 }
+
+function mergeFromParsed(parsed) {
+  if (!parsed || typeof parsed !== 'object') throw new Error('Neplatný soubor')
+  return {
+    ...defaultData,
+    ...parsed,
+    electricity: Array.isArray(parsed.electricity) ? parsed.electricity : defaultData.electricity,
+    water: Array.isArray(parsed.water) ? parsed.water : defaultData.water,
+    initialElectricity: parsed.initialElectricity != null ? Number(parsed.initialElectricity) : null,
+    initialWater: parsed.initialWater != null ? Number(parsed.initialWater) : null,
+    initialDate: parsed.initialDate && /^\d{4}-\d{2}-\d{2}$/.test(parsed.initialDate) ? parsed.initialDate : null,
+    pricePerKwh: parsed.pricePerKwh != null ? Number(parsed.pricePerKwh) : defaultData.pricePerKwh,
+    pricePerM3: parsed.pricePerM3 != null ? Number(parsed.pricePerM3) : defaultData.pricePerM3,
+  }
+}
+
+/** Obnovení dat ze zálohy (objekt po parse JSON) */
+export function parseBackupJSON(text) {
+  const root = JSON.parse(text)
+  const payload = root?.bytEnergieBackup === true && root.data ? root.data : root
+  return mergeFromParsed(payload)
+}
+
+/** Objekt pro uložení do souboru zálohy */
+export function createBackupPayload(data) {
+  return {
+    bytEnergieBackup: true,
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    data,
+  }
+}
