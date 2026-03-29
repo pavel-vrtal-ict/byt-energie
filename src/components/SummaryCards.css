@@ -1,0 +1,85 @@
+.summary-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .summary-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card-value-total {
+  font-size: 1.75rem;
+  color: var(--success);
+}
+
+.card-detail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.card-initial {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.9;
+}
+
+.card-electric {
+  border-left: 3px solid var(--accent-electric);
+}
+
+.card-water {
+  border-left: 3px solid var(--accent-water);
+}
+
+.card-total {
+  border-left: 3px solid var(--success);
+}
+
+@media (min-width: 900px) {
+  .card-total {
+    grid-column: span 1;
+  }
+}

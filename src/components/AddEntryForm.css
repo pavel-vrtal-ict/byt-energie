@@ -1,0 +1,71 @@
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.tab.active {
+  background: var(--accent-electric-dim);
+  border-color: var(--accent-electric);
+  color: var(--accent-electric);
+}
+
+.add-entry-form form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.add-entry-form form label span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.add-entry-form form input[type="number"],
+.add-entry-form form input[type="text"] {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  max-width: 220px;
+}
+
+.add-entry-form form input:focus {
+  outline: none;
+  border-color: var(--accent-electric);
+  box-shadow: 0 0 0 2px var(--accent-electric-dim);
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-note {
+  margin-bottom: 1rem;
+}
+
+.form-note input {
+  max-width: 320px;
+}

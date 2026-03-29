@@ -1,0 +1,99 @@
+.entry-list h2 {
+  margin-bottom: 0.25rem;
+}
+
+.entry-list-hint {
+  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.entry-group {
+  margin-bottom: 1.5rem;
+}
+
+.entry-group:last-child {
+  margin-bottom: 0;
+}
+
+.entry-group h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.entry:last-child {
+  border-bottom: none;
+}
+
+.entry-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.entry-date {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  min-width: 100px;
+}
+
+.entry-state {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.entry-consumption {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.entry-electric .entry-consumption {
+  color: var(--accent-electric);
+}
+
+.entry-water .entry-consumption {
+  color: var(--accent-water);
+}
+
+.entry-cost {
+  font-weight: 600;
+  color: var(--text);
+  margin-left: auto;
+}
+
+.entry-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  width: 100%;
+  padding-left: 0.25rem;
+}
+
+.entry .btn-danger {
+  margin-left: auto;
+}
+
+.empty {
+  margin: 0;
+  padding: 1rem 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
