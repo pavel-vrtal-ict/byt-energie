@@ -98,6 +98,7 @@ function App() {
             pricePerM3={data.pricePerM3}
             initialElectricity={data.initialElectricity}
             initialWater={data.initialWater}
+            initialDate={data.initialDate}
             onDeleteElectricity={handleDeleteElectricity}
             onDeleteWater={handleDeleteWater}
           />

@@ -10,17 +10,49 @@ export function EntryList({
   pricePerM3,
   initialElectricity,
   initialWater,
+  initialDate,
   onDeleteElectricity,
   onDeleteWater,
 }) {
-  const electricRows = useMemo(
-    () => getConsumptionsWithEntries(electricity, initialElectricity),
-    [electricity, initialElectricity]
-  )
-  const waterRows = useMemo(
-    () => getConsumptionsWithEntries(water, initialWater),
-    [water, initialWater]
-  )
+  const electricRows = useMemo(() => {
+    const rows = getConsumptionsWithEntries(electricity, initialElectricity)
+    const hasInitial =
+      initialElectricity != null &&
+      !Number.isNaN(initialElectricity) &&
+      initialDate &&
+      /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+
+    if (!hasInitial) return rows
+
+    return [
+      {
+        entry: { id: '__initial_electricity__', date: initialDate, value: initialElectricity, note: 'Výchozí stav' },
+        consumption: 0,
+        isInitial: true,
+      },
+      ...rows,
+    ]
+  }, [electricity, initialElectricity, initialDate])
+
+  const waterRows = useMemo(() => {
+    const rows = getConsumptionsWithEntries(water, initialWater)
+    const hasInitial =
+      initialWater != null &&
+      !Number.isNaN(initialWater) &&
+      initialDate &&
+      /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+
+    if (!hasInitial) return rows
+
+    return [
+      {
+        entry: { id: '__initial_water__', date: initialDate, value: initialWater, note: 'Výchozí stav' },
+        consumption: 0,
+        isInitial: true,
+      },
+      ...rows,
+    ]
+  }, [water, initialWater, initialDate])
 
   return (
     <div className="entry-list">
@@ -34,7 +66,7 @@ export function EntryList({
         ) : (
           <ul className="entries">
             {[...electricRows].reverse().map(({ entry, consumption }) => (
-              <li key={entry.id} className="entry entry-electric">
+              <li key={entry.id} className={`entry entry-electric ${entry.note === 'Výchozí stav' ? 'entry-initial' : ''}`}>
                 <div className="entry-main">
                   <span className="entry-date">{formatDate(entry.date)}</span>
                   <span className="entry-state">Stav: {formatNumber(entry.value, 1, 1)} kWh</span>
@@ -42,14 +74,16 @@ export function EntryList({
                   <span className="entry-cost">{formatMoney(consumption * pricePerKwh)}</span>
                 </div>
                 {entry.note && <span className="entry-note">{entry.note}</span>}
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => onDeleteElectricity(entry.id)}
-                  title="Smazat"
-                >
-                  ✕
-                </button>
+                {entry.note !== 'Výchozí stav' && (
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => onDeleteElectricity(entry.id)}
+                    title="Smazat"
+                  >
+                    ✕
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -63,7 +97,7 @@ export function EntryList({
         ) : (
           <ul className="entries">
             {[...waterRows].reverse().map(({ entry, consumption }) => (
-              <li key={entry.id} className="entry entry-water">
+              <li key={entry.id} className={`entry entry-water ${entry.note === 'Výchozí stav' ? 'entry-initial' : ''}`}>
                 <div className="entry-main">
                   <span className="entry-date">{formatDate(entry.date)}</span>
                   <span className="entry-state">Stav: {formatNumber(entry.value, 1, 2)} m³</span>
@@ -71,14 +105,16 @@ export function EntryList({
                   <span className="entry-cost">{formatMoney(consumption * pricePerM3)}</span>
                 </div>
                 {entry.note && <span className="entry-note">{entry.note}</span>}
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => onDeleteWater(entry.id)}
-                  title="Smazat"
-                >
-                  ✕
-                </button>
+                {entry.note !== 'Výchozí stav' && (
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => onDeleteWater(entry.id)}
+                    title="Smazat"
+                  >
+                    ✕
+                  </button>
+                )}
               </li>
             ))}
           </ul>

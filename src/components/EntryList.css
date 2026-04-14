@@ -74,6 +74,16 @@
   color: var(--accent-water);
 }
 
+.entry-initial .entry-consumption,
+.entry-initial .entry-cost {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.entry-initial .entry-note {
+  font-style: italic;
+}
+
 .entry-cost {
   font-weight: 600;
   color: var(--text);
