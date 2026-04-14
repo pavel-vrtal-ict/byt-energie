@@ -30,7 +30,14 @@ export function ConsumptionCharts({ electricity, water, initialElectricity, init
     if (!hasInitial) return base
 
     return [
-      { date: initialDate, label: formatDateShort(initialDate), kWh: 0, note: 'Výchozí stav' },
+      {
+        date: initialDate,
+        label: formatDateShort(initialDate),
+        kWh: 0,
+        note: 'Výchozí stav',
+        isInitial: true,
+        meterValue: initialElectricity,
+      },
       ...base,
     ].sort((a, b) => new Date(a.date) - new Date(b.date))
   }, [electricity, initialElectricity, initialDate])
@@ -51,9 +58,17 @@ export function ConsumptionCharts({ electricity, water, initialElectricity, init
 
     if (!hasInitial) return base
 
-    return [{ date: initialDate, label: formatDateShort(initialDate), m3: 0, note: 'Výchozí stav' }, ...base].sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    )
+    return [
+      {
+        date: initialDate,
+        label: formatDateShort(initialDate),
+        m3: 0,
+        note: 'Výchozí stav',
+        isInitial: true,
+        meterValue: initialWater,
+      },
+      ...base,
+    ].sort((a, b) => new Date(a.date) - new Date(b.date))
   }, [water, initialWater, initialDate])
 
   const CustomTooltip = ({ active, payload, unit, decimals = 1 }) => {
@@ -63,9 +78,15 @@ export function ConsumptionCharts({ electricity, water, initialElectricity, init
     return (
       <div className="chart-tooltip">
         <div className="chart-tooltip-label">{p.label}</div>
-        <div className="chart-tooltip-value">
-          {formatNumber(value, decimals, decimals)} {unit}
-        </div>
+        {p.isInitial ? (
+          <div className="chart-tooltip-value">
+            Výchozí stav: {formatNumber(p.meterValue, unit === 'kWh' ? 1 : 1, unit === 'kWh' ? 1 : 2)} {unit}
+          </div>
+        ) : (
+          <div className="chart-tooltip-value">
+            {formatNumber(value, decimals, decimals)} {unit}
+          </div>
+        )}
         {p.note && <div className="chart-tooltip-note">{p.note}</div>}
       </div>
     )
