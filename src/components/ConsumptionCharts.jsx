@@ -12,26 +12,49 @@ import { formatDateShort, formatNumber } from '../utils/format'
 import { getConsumptionsWithEntries } from '../data/consumption'
 import './ConsumptionCharts.css'
 
-export function ConsumptionCharts({ electricity, water, initialElectricity, initialWater }) {
+export function ConsumptionCharts({ electricity, water, initialElectricity, initialWater, initialDate }) {
   const electricData = useMemo(() => {
     const rows = getConsumptionsWithEntries(electricity, initialElectricity)
-    return rows.map(({ entry, consumption }) => ({
+    const base = rows.map(({ entry, consumption }) => ({
       date: entry.date,
       label: formatDateShort(entry.date),
       kWh: Math.round(consumption * 100) / 100,
       note: entry.note,
     }))
-  }, [electricity, initialElectricity])
+    const hasInitial =
+      initialElectricity != null &&
+      !Number.isNaN(initialElectricity) &&
+      initialDate &&
+      /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+
+    if (!hasInitial) return base
+
+    return [
+      { date: initialDate, label: formatDateShort(initialDate), kWh: 0, note: 'Výchozí stav' },
+      ...base,
+    ].sort((a, b) => new Date(a.date) - new Date(b.date))
+  }, [electricity, initialElectricity, initialDate])
 
   const waterData = useMemo(() => {
     const rows = getConsumptionsWithEntries(water, initialWater)
-    return rows.map(({ entry, consumption }) => ({
+    const base = rows.map(({ entry, consumption }) => ({
       date: entry.date,
       label: formatDateShort(entry.date),
       m3: Math.round(consumption * 100) / 100,
       note: entry.note,
     }))
-  }, [water, initialWater])
+    const hasInitial =
+      initialWater != null &&
+      !Number.isNaN(initialWater) &&
+      initialDate &&
+      /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+
+    if (!hasInitial) return base
+
+    return [{ date: initialDate, label: formatDateShort(initialDate), m3: 0, note: 'Výchozí stav' }, ...base].sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    )
+  }, [water, initialWater, initialDate])
 
   const CustomTooltip = ({ active, payload, unit, decimals = 1 }) => {
     if (!active || !payload?.length) return null

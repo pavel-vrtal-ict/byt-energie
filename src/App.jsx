@@ -87,6 +87,7 @@ function App() {
           water={data.water}
           initialElectricity={data.initialElectricity}
           initialWater={data.initialWater}
+          initialDate={data.initialDate}
         />
         </section>
 
