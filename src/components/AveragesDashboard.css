@@ -55,6 +55,20 @@
   display: flex;
   align-items: center;
   gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.dash-headline-since {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .dash-headline-icon {
@@ -115,6 +129,43 @@
   letter-spacing: 0.05em;
   margin-top: auto;
   padding-top: 0.4rem;
+}
+
+.dash-headline-trend {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-muted);
+}
+
+.dash-trend-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.dash-trend-up .dash-trend-arrow {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+}
+
+.dash-trend-down .dash-trend-arrow {
+  background: rgba(34, 197, 94, 0.18);
+  color: #4ade80;
+}
+
+.dash-trend-flat .dash-trend-arrow {
+  background: var(--bg);
+  color: var(--text-muted);
 }
 
 .dash-resource {

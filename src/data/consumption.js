@@ -148,6 +148,46 @@ export function getAverageConsumptionPerDay(entries, initialValue, initialDate, 
 }
 
 /**
+ * Rychlost spotřeby od posledního odečtu (jednotek za den) na základě posledních dvou bodů.
+ * Vrací null, pokud nejsou aspoň dva (výchozí stav + první odečet, nebo dva odečty).
+ *
+ * { ratePerDay, intervalDays, fromDate, toDate, totalConsumption }
+ */
+export function getLatestIntervalRate(entries, initialValue, initialDate) {
+  const series = getConsumptionRateSeries(entries, initialValue, initialDate)
+  if (series.length === 0) return null
+  const last = series[series.length - 1]
+  return {
+    ratePerDay: last.ratePerDay,
+    intervalDays: last.intervalDays,
+    fromDate: last.prevDate,
+    toDate: last.date,
+    totalConsumption: last.ratePerDay * last.intervalDays,
+  }
+}
+
+/**
+ * Lifetime (celkový) průměr za den napříč všemi vloženými intervaly.
+ * Spočítá se jako součet spotřeb / součet dní intervalů (vážený průměr).
+ */
+export function getLifetimeAveragePerDay(entries, initialValue, initialDate) {
+  const series = getConsumptionRateSeries(entries, initialValue, initialDate)
+  if (series.length === 0) return null
+  let totalConsumption = 0
+  let totalDays = 0
+  for (const p of series) {
+    totalConsumption += p.ratePerDay * p.intervalDays
+    totalDays += p.intervalDays
+  }
+  if (!(totalDays > 0)) return null
+  return {
+    perDay: totalConsumption / totalDays,
+    totalDays,
+    totalConsumption,
+  }
+}
+
+/**
  * Vrátí pole bodů { date, label, ratePerDay, intervalDays, prevDate } popisujících rychlost
  * spotřeby (jednotek za den) v intervalu mezi předchozím a aktuálním odečtem.
  *

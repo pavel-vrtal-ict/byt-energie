@@ -11,8 +11,13 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts'
-import { formatMoney, formatNumber, formatDateShort } from '../utils/format'
-import { getAverageConsumptionPerDay, getConsumptionRateSeries } from '../data/consumption'
+import { formatMoney, formatNumber, formatDate, formatDateShort } from '../utils/format'
+import {
+  getAverageConsumptionPerDay,
+  getConsumptionRateSeries,
+  getLatestIntervalRate,
+  getLifetimeAveragePerDay,
+} from '../data/consumption'
 import './AveragesDashboard.css'
 
 const PERIODS = [
@@ -69,6 +74,57 @@ function RateTooltip({ active, payload, unit, decimals, pricePerUnit }) {
       </div>
       <div className="dash-tooltip-detail">{formatMoney(p.ratePerDay * pricePerUnit)}/den</div>
     </div>
+  )
+}
+
+function HeadlineCard({ modifier, icon, name, unit, decimals, monthDecimals, pricePerUnit, latest, lifetime }) {
+  if (!latest) {
+    return (
+      <article className={`dash-headline dash-headline-${modifier}`}>
+        <header>
+          <span className="dash-headline-icon">{icon}</span>
+          <span className="dash-headline-name">{name}</span>
+        </header>
+        <p className="dash-empty">Přidejte výchozí stav a alespoň jeden odečet.</p>
+      </article>
+    )
+  }
+
+  const { ratePerDay, intervalDays, fromDate, toDate, totalConsumption } = latest
+  const lifetimeRate = lifetime?.perDay ?? null
+  const diffPct = lifetimeRate && lifetimeRate > 0 ? ((ratePerDay - lifetimeRate) / lifetimeRate) * 100 : null
+  const trend = diffPct == null ? null : diffPct > 1 ? 'up' : diffPct < -1 ? 'down' : 'flat'
+  const trendArrow = trend === 'up' ? '▲' : trend === 'down' ? '▼' : '≈'
+  const intervalDaysRounded = Math.round(intervalDays)
+
+  return (
+    <article className={`dash-headline dash-headline-${modifier}`}>
+      <header>
+        <span className="dash-headline-icon">{icon}</span>
+        <span className="dash-headline-name">{name}</span>
+        <span className="dash-headline-since">Od posledního odečtu</span>
+      </header>
+      <div className="dash-headline-value">
+        <span className="dash-headline-num">{formatNumber(ratePerDay, decimals, decimals)}</span>
+        <span className="dash-headline-unit">{unit} / den</span>
+      </div>
+      <div className="dash-headline-meta">
+        {formatDate(fromDate)} → {formatDate(toDate)} · {intervalDaysRounded} {intervalDaysRounded === 1 ? 'den' : intervalDaysRounded < 5 ? 'dny' : 'dní'} · {formatNumber(totalConsumption, decimals, decimals)} {unit}
+      </div>
+      <div className="dash-headline-cost">
+        {formatMoney(ratePerDay * pricePerUnit)} / den
+        <span className="dash-headline-sep">·</span>
+        ≈ {formatMoney(ratePerDay * pricePerUnit * 30)} / měsíc
+      </div>
+      {lifetimeRate != null && (
+        <div className={`dash-headline-trend dash-trend-${trend}`}>
+          <span className="dash-trend-arrow" aria-hidden="true">{trendArrow}</span>
+          {trend === 'flat'
+            ? 'Stejné jako dlouhodobý průměr'
+            : `${diffPct > 0 ? '+' : ''}${formatNumber(diffPct, 0, 1)} % oproti dlouhodobému průměru (${formatNumber(lifetimeRate, decimals, decimals)} ${unit}/den)`}
+        </div>
+      )}
+    </article>
   )
 }
 
@@ -205,63 +261,48 @@ export function AveragesDashboard({ data }) {
     return series.map((p) => ({ ...p, label: formatDateShort(p.date), prevLabel: formatDateShort(p.prevDate) }))
   }, [water, initialWater, initialDate])
 
-  const headlineElec = elecPeriods[0].ok ? elecPeriods[0] : elecPeriods.find((p) => p.ok)
-  const headlineWater = waterPeriods[0].ok ? waterPeriods[0] : waterPeriods.find((p) => p.ok)
+  const elecLatest = useMemo(
+    () => getLatestIntervalRate(electricity, initialElectricity, initialDate),
+    [electricity, initialElectricity, initialDate]
+  )
+  const waterLatest = useMemo(
+    () => getLatestIntervalRate(water, initialWater, initialDate),
+    [water, initialWater, initialDate]
+  )
+  const elecLifetime = useMemo(
+    () => getLifetimeAveragePerDay(electricity, initialElectricity, initialDate),
+    [electricity, initialElectricity, initialDate]
+  )
+  const waterLifetime = useMemo(
+    () => getLifetimeAveragePerDay(water, initialWater, initialDate),
+    [water, initialWater, initialDate]
+  )
 
   return (
     <section className="dash" aria-label="Přehled průměrné spotřeby">
       <div className="dash-headlines">
-        <article className="dash-headline dash-headline-electric">
-          <header>
-            <span className="dash-headline-icon">⚡</span>
-            <span className="dash-headline-name">Elektřina</span>
-          </header>
-          {headlineElec ? (
-            <>
-              <div className="dash-headline-value">
-                <span className="dash-headline-num">{formatNumber(headlineElec.perDay, 1, 2)}</span>
-                <span className="dash-headline-unit">kWh / den</span>
-              </div>
-              <div className="dash-headline-meta">
-                ≈ {formatNumber(headlineElec.perDay * 30, 0, 1)} kWh / měsíc
-              </div>
-              <div className="dash-headline-cost">
-                {formatMoney(headlineElec.perDay * pricePerKwh)} / den
-                <span className="dash-headline-sep">·</span>
-                {formatMoney(headlineElec.perDay * pricePerKwh * 30)} / měsíc
-              </div>
-              <div className="dash-headline-tag">Z období: {headlineElec.label.toLowerCase()}</div>
-            </>
-          ) : (
-            <p className="dash-empty">Přidejte výchozí stav a alespoň jeden odečet.</p>
-          )}
-        </article>
-
-        <article className="dash-headline dash-headline-water">
-          <header>
-            <span className="dash-headline-icon">💧</span>
-            <span className="dash-headline-name">Voda</span>
-          </header>
-          {headlineWater ? (
-            <>
-              <div className="dash-headline-value">
-                <span className="dash-headline-num">{formatNumber(headlineWater.perDay, 1, 3)}</span>
-                <span className="dash-headline-unit">m³ / den</span>
-              </div>
-              <div className="dash-headline-meta">
-                ≈ {formatNumber(headlineWater.perDay * 30, 1, 2)} m³ / měsíc
-              </div>
-              <div className="dash-headline-cost">
-                {formatMoney(headlineWater.perDay * pricePerM3)} / den
-                <span className="dash-headline-sep">·</span>
-                {formatMoney(headlineWater.perDay * pricePerM3 * 30)} / měsíc
-              </div>
-              <div className="dash-headline-tag">Z období: {headlineWater.label.toLowerCase()}</div>
-            </>
-          ) : (
-            <p className="dash-empty">Přidejte výchozí stav a alespoň jeden odečet.</p>
-          )}
-        </article>
+        <HeadlineCard
+          modifier="electric"
+          icon="⚡"
+          name="Elektřina"
+          unit="kWh"
+          decimals={2}
+          monthDecimals={1}
+          pricePerUnit={pricePerKwh}
+          latest={elecLatest}
+          lifetime={elecLifetime}
+        />
+        <HeadlineCard
+          modifier="water"
+          icon="💧"
+          name="Voda"
+          unit="m³"
+          decimals={3}
+          monthDecimals={2}
+          pricePerUnit={pricePerM3}
+          latest={waterLatest}
+          lifetime={waterLifetime}
+        />
       </div>
 
       <ResourceCharts
