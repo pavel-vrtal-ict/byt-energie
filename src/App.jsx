@@ -10,11 +10,10 @@ import {
   updateInitialState,
 } from './data/storage'
 import { Header } from './components/Header'
-import { PriceSettings } from './components/PriceSettings'
+import { FloatingPricePanel } from './components/FloatingPricePanel'
 import { InitialStateSettings } from './components/InitialStateSettings'
 import { AddEntryForm } from './components/AddEntryForm'
 import { SummaryCards } from './components/SummaryCards'
-import { ConsumptionCharts } from './components/ConsumptionCharts'
 import { EntryList } from './components/EntryList'
 import { BackupRestore } from './components/BackupRestore'
 import './App.css'
@@ -58,14 +57,6 @@ function App() {
     <div className="app">
       <Header />
       <main className="main">
-        <section className="section settings-section">
-          <PriceSettings
-            pricePerKwh={data.pricePerKwh}
-            pricePerM3={data.pricePerM3}
-            onSave={handleUpdatePrices}
-          />
-        </section>
-
         <section className="section initial-state-section">
           <InitialStateSettings
             initialElectricity={data.initialElectricity}
@@ -81,15 +72,10 @@ function App() {
 
         <SummaryCards data={data} />
 
-        <section className="section charts-section">
-          <ConsumptionCharts
-          electricity={data.electricity}
-          water={data.water}
-          initialElectricity={data.initialElectricity}
-          initialWater={data.initialWater}
-          initialDate={data.initialDate}
-        />
-        </section>
+        <p className="floating-entry-hint" role="note">
+          Ceny za jednotku a průměrnou spotřebu (den, týden, měsíc, rok) otevřete tlačítkem <strong>Ceny a průměry</strong>{' '}
+          vpravo dole.
+        </p>
 
         <section className="section list-section">
           <EntryList
@@ -109,6 +95,8 @@ function App() {
           <BackupRestore data={data} onRestore={handleRestoreBackup} />
         </section>
       </main>
+
+      <FloatingPricePanel data={data} onSavePrices={handleUpdatePrices} />
     </div>
   )
 }

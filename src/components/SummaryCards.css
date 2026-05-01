@@ -66,39 +66,6 @@
   opacity: 0.9;
 }
 
-.card-avg {
-  margin-top: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.card-avg-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.card-avg-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.chip {
-  font-size: 0.72rem;
-  padding: 0.2rem 0.45rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text);
-}
-
-.chip-period {
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-right: 0.15rem;
-}
-
 .card-electric {
   border-left: 3px solid var(--accent-electric);
 }
