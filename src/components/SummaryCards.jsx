@@ -29,7 +29,7 @@ export function SummaryCards({ data }) {
   }, [electricity, water, pricePerKwh, pricePerM3, initialElectricity, initialWater, initialDate])
 
   return (
-    <section className="summary-cards">
+    <section className="summary-cards" id="souhrn-prumery" aria-label="Souhrn spotřeby a průměry">
       <div className="card card-electric">
         <span className="card-icon">⚡</span>
         <div className="card-content">
@@ -37,11 +37,17 @@ export function SummaryCards({ data }) {
           <span className="card-value">{formatMoney(summary.elecCost)}</span>
           <span className="card-detail">{formatNumber(summary.totalKwh, 1, 1)} kWh celkem</span>
           <div className="card-avg">
-            <span className="card-avg-label">Průměr (kWh/den)</span>
+            <span className="card-avg-label">Průměr za posledních N dní (kWh/den)</span>
             <div className="card-avg-row">
-              <span className="chip">7 dní: {formatNumber(summary.avg.elec.d7, 1, 2)}</span>
-              <span className="chip">30 dní: {formatNumber(summary.avg.elec.d30, 1, 2)}</span>
-              <span className="chip">365 dní: {formatNumber(summary.avg.elec.d365, 1, 2)}</span>
+              <span className="chip">
+                <span className="chip-period">Týden</span> {formatNumber(summary.avg.elec.d7, 1, 2)}
+              </span>
+              <span className="chip">
+                <span className="chip-period">Měsíc</span> {formatNumber(summary.avg.elec.d30, 1, 2)}
+              </span>
+              <span className="chip">
+                <span className="chip-period">Rok</span> {formatNumber(summary.avg.elec.d365, 1, 2)}
+              </span>
             </div>
           </div>
           {initialElectricity != null && (
@@ -59,11 +65,17 @@ export function SummaryCards({ data }) {
           <span className="card-value">{formatMoney(summary.waterCost)}</span>
           <span className="card-detail">{formatNumber(summary.totalM3, 1, 1)} m³ celkem</span>
           <div className="card-avg">
-            <span className="card-avg-label">Průměr (m³/den)</span>
+            <span className="card-avg-label">Průměr za posledních N dní (m³/den)</span>
             <div className="card-avg-row">
-              <span className="chip">7 dní: {formatNumber(summary.avg.water.d7, 1, 3)}</span>
-              <span className="chip">30 dní: {formatNumber(summary.avg.water.d30, 1, 3)}</span>
-              <span className="chip">365 dní: {formatNumber(summary.avg.water.d365, 1, 3)}</span>
+              <span className="chip">
+                <span className="chip-period">Týden</span> {formatNumber(summary.avg.water.d7, 1, 3)}
+              </span>
+              <span className="chip">
+                <span className="chip-period">Měsíc</span> {formatNumber(summary.avg.water.d30, 1, 3)}
+              </span>
+              <span className="chip">
+                <span className="chip-period">Rok</span> {formatNumber(summary.avg.water.d365, 1, 3)}
+              </span>
             </div>
           </div>
           {initialWater != null && (
