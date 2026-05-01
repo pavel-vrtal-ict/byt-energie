@@ -108,3 +108,48 @@ export function getAverageConsumptionPerDay(entries, initialValue, initialDate, 
   const avgPerDay = hadAnyInterval ? total / windowDays : 0
   return { avgPerDay, totalInWindow: total, windowDays, hasEnoughData: hadAnyInterval, asOfDate: asOf }
 }
+
+/**
+ * Vrátí pole bodů { date, label, ratePerDay, intervalDays, prevDate } popisujících rychlost
+ * spotřeby (jednotek za den) v intervalu mezi předchozím a aktuálním odečtem.
+ *
+ * Tohle je smysluplné i u nepravidelných odečtů, protože y-osa je už normalizovaná na den.
+ *
+ * - S výchozím stavem: první bod je za interval výchozí datum → první odečet.
+ * - Bez výchozího stavu: první odečet bere jako spotřebu „od minulého období“ a interval
+ *   mu dopočítá až další odečet (proto první bod vynecháme; přidá se až od druhého odečtu).
+ */
+export function getConsumptionRateSeries(entries, initialValue, initialDate) {
+  const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date))
+  if (sorted.length === 0) return []
+
+  const hasInitial =
+    initialValue != null &&
+    !Number.isNaN(initialValue) &&
+    typeof initialDate === 'string' &&
+    ISO_DATE_RE.test(initialDate)
+
+  const points = hasInitial
+    ? [{ date: initialDate, value: Number(initialValue) }, ...sorted.map((e) => ({ date: e.date, value: e.value }))]
+    : sorted.map((e) => ({ date: e.date, value: e.value }))
+
+  const result = []
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1]
+    const cur = points[i]
+    const start = toDateLocal(prev.date)
+    const end = toDateLocal(cur.date)
+    const intervalDays = daysBetween(start, end)
+    if (!(intervalDays > 0)) continue
+
+    const consumption = hasInitial ? Number(cur.value) - Number(prev.value) : Number(cur.value)
+    const safe = Math.max(0, consumption)
+    result.push({
+      date: cur.date,
+      prevDate: prev.date,
+      ratePerDay: safe / intervalDays,
+      intervalDays,
+    })
+  }
+  return result
+}

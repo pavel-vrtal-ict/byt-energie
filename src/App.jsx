@@ -10,10 +10,11 @@ import {
   updateInitialState,
 } from './data/storage'
 import { Header } from './components/Header'
-import { FloatingPricePanel } from './components/FloatingPricePanel'
+import { PriceSettings } from './components/PriceSettings'
 import { InitialStateSettings } from './components/InitialStateSettings'
 import { AddEntryForm } from './components/AddEntryForm'
 import { SummaryCards } from './components/SummaryCards'
+import { AveragesDashboard } from './components/AveragesDashboard'
 import { EntryList } from './components/EntryList'
 import { BackupRestore } from './components/BackupRestore'
 import './App.css'
@@ -57,25 +58,35 @@ function App() {
     <div className="app">
       <Header />
       <main className="main">
-        <section className="section initial-state-section">
-          <InitialStateSettings
-            initialElectricity={data.initialElectricity}
-            initialWater={data.initialWater}
-            initialDate={data.initialDate}
-            onSave={handleUpdateInitialState}
-          />
+        <SummaryCards data={data} />
+
+        <section className="section dashboard-section" aria-label="Průměrná spotřeba a grafy">
+          <h2>Přehled spotřeby</h2>
+          <AveragesDashboard data={data} />
         </section>
 
         <section className="section form-section">
           <AddEntryForm onAddElectricity={handleAddElectricity} onAddWater={handleAddWater} />
         </section>
 
-        <SummaryCards data={data} />
+        <div className="settings-grid">
+          <section className="section settings-section">
+            <PriceSettings
+              pricePerKwh={data.pricePerKwh}
+              pricePerM3={data.pricePerM3}
+              onSave={handleUpdatePrices}
+            />
+          </section>
 
-        <p className="floating-entry-hint" role="note">
-          Ceny za jednotku a průměrnou spotřebu (den, týden, měsíc, rok) otevřete tlačítkem <strong>Ceny a průměry</strong>{' '}
-          vpravo dole.
-        </p>
+          <section className="section initial-state-section">
+            <InitialStateSettings
+              initialElectricity={data.initialElectricity}
+              initialWater={data.initialWater}
+              initialDate={data.initialDate}
+              onSave={handleUpdateInitialState}
+            />
+          </section>
+        </div>
 
         <section className="section list-section">
           <EntryList
@@ -95,8 +106,6 @@ function App() {
           <BackupRestore data={data} onRestore={handleRestoreBackup} />
         </section>
       </main>
-
-      <FloatingPricePanel data={data} onSavePrices={handleUpdatePrices} />
     </div>
   )
 }

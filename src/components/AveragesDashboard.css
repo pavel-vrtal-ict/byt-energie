@@ -1,0 +1,226 @@
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.dash-headlines {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 720px) {
+  .dash-headlines {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dash-headline {
+  position: relative;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.dash-headline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, var(--accent), transparent 60%);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.dash-headline-electric {
+  --accent: var(--accent-electric);
+  border-left: 3px solid var(--accent-electric);
+}
+
+.dash-headline-water {
+  --accent: var(--accent-water);
+  border-left: 3px solid var(--accent-water);
+}
+
+.dash-headline > * {
+  position: relative;
+}
+
+.dash-headline header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dash-headline-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.dash-headline-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dash-headline-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.dash-headline-num {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-headline-unit {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.dash-headline-meta {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.dash-headline-cost {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.dash-headline-sep {
+  margin: 0 0.4rem;
+  color: var(--text-muted);
+}
+
+.dash-headline-tag {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+.dash-resource {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.dash-resource-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.dash-resource-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.dash-resource-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dash-charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .dash-charts {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+}
+
+.dash-chart-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.dash-chart-title {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dash-empty {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.dash-footnote {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0.85;
+}
+
+.dash-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  box-shadow: var(--shadow);
+  min-width: 11rem;
+}
+
+.dash-tooltip-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.dash-tooltip-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dash-tooltip-detail {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.dash-tooltip-na {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
