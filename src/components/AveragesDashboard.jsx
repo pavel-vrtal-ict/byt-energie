@@ -37,12 +37,16 @@ function PeriodTooltip({ active, payload, unit, decimals, pricePerUnit }) {
   }
   return (
     <div className="dash-tooltip">
-      <div className="dash-tooltip-label">{p.label}</div>
+      <div className="dash-tooltip-label">
+        {p.label}
+        {p.isPartial && <span className="dash-tooltip-pill">jen {formatNumber(p.effectiveWindowDays, 0, 1)} dní dat</span>}
+      </div>
       <div className="dash-tooltip-value">
         {formatNumber(p.perDay, decimals, decimals)} {unit}/den
       </div>
       <div className="dash-tooltip-detail">
         Za období: {formatNumber(p.totalInWindow, decimals, decimals)} {unit}
+        {p.isPartial && ` (cíl ${p.days} dní)`}
       </div>
       <div className="dash-tooltip-detail">
         Náklady: {formatMoney(p.perDay * pricePerUnit)}/den · {formatMoney(p.totalInWindow * pricePerUnit)} celkem
@@ -108,13 +112,11 @@ function ResourceCharts({
                   content={<PeriodTooltip unit={unit} decimals={decimals} pricePerUnit={pricePerUnit} />}
                 />
                 <Bar dataKey="perDay" radius={[8, 8, 0, 0]}>
-                  {periodData.map((d) => (
-                    <Cell
-                      key={d.key}
-                      fill={`var(${accentVar})`}
-                      fillOpacity={d.ok ? PERIOD_BAR_OPACITY[d.key] ?? 1 : 0.1}
-                    />
-                  ))}
+                  {periodData.map((d) => {
+                    const baseOpacity = PERIOD_BAR_OPACITY[d.key] ?? 1
+                    const fillOpacity = !d.ok ? 0.1 : d.isPartial ? Math.min(baseOpacity, 0.45) : baseOpacity
+                    return <Cell key={d.key} fill={`var(${accentVar})`} fillOpacity={fillOpacity} />
+                  })}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -170,6 +172,8 @@ export function AveragesDashboard({ data }) {
         days,
         perDay: r.hasEnoughData ? r.avgPerDay : 0,
         totalInWindow: r.totalInWindow,
+        effectiveWindowDays: r.effectiveWindowDays,
+        isPartial: r.isPartial,
         ok: r.hasEnoughData,
       }
     })
@@ -184,6 +188,8 @@ export function AveragesDashboard({ data }) {
         days,
         perDay: r.hasEnoughData ? r.avgPerDay : 0,
         totalInWindow: r.totalInWindow,
+        effectiveWindowDays: r.effectiveWindowDays,
+        isPartial: r.isPartial,
         ok: r.hasEnoughData,
       }
     })
@@ -286,7 +292,8 @@ export function AveragesDashboard({ data }) {
 
       <p className="dash-footnote">
         Spotřeba mezi odečty je rozpočítána do dnů a sečtena podle překryvu s daným oknem (Den / Týden / Měsíc / Rok).
-        Tím je výsledek srovnatelný i při nepravidelných odečtech.
+        Pokud nemáte dost dat na celé okno, zkrátí se na skutečný rozsah – takové sloupce jsou světlejší a v tooltipu
+        je uvedeno „jen X dní dat“.
       </p>
     </section>
   )

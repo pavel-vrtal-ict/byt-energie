@@ -53,12 +53,24 @@ export function getTotalConsumptionAndCost(entries, initialValue, pricePerUnit) 
  * Průměrná spotřeba za posledních N dní (kWh/m³ za den) podle vložených odečtů.
  * Spotřebu mezi dvěma datumy rozpočítá rovnoměrně do dnů a vezme pouze překryv s oknem.
  *
- * Vrací { avgPerDay, totalInWindow, windowDays, hasEnoughData, asOfDate }
+ * Důležité: pokud uživatel nemá `windowDays` dat, okno se zkrátí na skutečně dostupný rozsah,
+ * abychom průměr nezředili nulami za "prázdné" dny. To se hlásí přes `effectiveWindowDays`
+ * a `isPartial`.
+ *
+ * Vrací { avgPerDay, totalInWindow, windowDays, effectiveWindowDays, isPartial, hasEnoughData, asOfDate }
  */
 export function getAverageConsumptionPerDay(entries, initialValue, initialDate, windowDays) {
   const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date))
   if (sorted.length === 0) {
-    return { avgPerDay: 0, totalInWindow: 0, windowDays, hasEnoughData: false, asOfDate: null }
+    return {
+      avgPerDay: 0,
+      totalInWindow: 0,
+      windowDays,
+      effectiveWindowDays: 0,
+      isPartial: true,
+      hasEnoughData: false,
+      asOfDate: null,
+    }
   }
 
   const hasInitial =
@@ -68,15 +80,37 @@ export function getAverageConsumptionPerDay(entries, initialValue, initialDate, 
     ? [{ date: initialDate, value: Number(initialValue), isInitial: true }, ...sorted.map((e) => ({ date: e.date, value: e.value }))]
     : sorted.map((e) => ({ date: e.date, value: e.value }))
 
-  // Potřebujeme aspoň 2 body, abychom znali interval.
   if (points.length < 2) {
     const asOf = toDateLocal(points[0].date)
-    return { avgPerDay: 0, totalInWindow: 0, windowDays, hasEnoughData: false, asOfDate: asOf }
+    return {
+      avgPerDay: 0,
+      totalInWindow: 0,
+      windowDays,
+      effectiveWindowDays: 0,
+      isPartial: true,
+      hasEnoughData: false,
+      asOfDate: asOf,
+    }
   }
 
+  const firstDate = toDateLocal(points[0].date)
   const asOf = toDateLocal(points[points.length - 1].date)
+  const dataSpanDays = daysBetween(firstDate, asOf)
+  if (!(dataSpanDays > 0)) {
+    return {
+      avgPerDay: 0,
+      totalInWindow: 0,
+      windowDays,
+      effectiveWindowDays: 0,
+      isPartial: true,
+      hasEnoughData: false,
+      asOfDate: asOf,
+    }
+  }
+
+  const effectiveWindowDays = Math.min(windowDays, dataSpanDays)
   const windowEnd = asOf
-  const windowStart = new Date(windowEnd.getTime() - windowDays * 24 * 60 * 60 * 1000)
+  const windowStart = new Date(windowEnd.getTime() - effectiveWindowDays * 24 * 60 * 60 * 1000)
 
   let total = 0
   let hadAnyInterval = false
@@ -89,13 +123,9 @@ export function getAverageConsumptionPerDay(entries, initialValue, initialDate, 
     const intervalDays = daysBetween(intervalStart, intervalEnd)
     if (!(intervalDays > 0)) continue
 
-    // Spotřeba za interval:
-    // - s výchozím stavem: rozdíl stavů měřidla
-    // - bez výchozího stavu: hodnota je spotřeba "za období", proto bereme cur.value jako spotřebu za interval prev->cur
     const rawConsumption = hasInitial ? Number(cur.value) - Number(prev.value) : Number(cur.value)
     const intervalConsumption = Math.max(0, rawConsumption)
 
-    // Překryv s oknem:
     const overlapStart = intervalStart > windowStart ? intervalStart : windowStart
     const overlapEnd = intervalEnd < windowEnd ? intervalEnd : windowEnd
     const overlapDays = daysBetween(overlapStart, overlapEnd)
@@ -105,8 +135,16 @@ export function getAverageConsumptionPerDay(entries, initialValue, initialDate, 
     total += intervalConsumption * (overlapDays / intervalDays)
   }
 
-  const avgPerDay = hadAnyInterval ? total / windowDays : 0
-  return { avgPerDay, totalInWindow: total, windowDays, hasEnoughData: hadAnyInterval, asOfDate: asOf }
+  const avgPerDay = hadAnyInterval ? total / effectiveWindowDays : 0
+  return {
+    avgPerDay,
+    totalInWindow: total,
+    windowDays,
+    effectiveWindowDays,
+    isPartial: effectiveWindowDays < windowDays,
+    hasEnoughData: hadAnyInterval,
+    asOfDate: asOf,
+  }
 }
 
 /**
